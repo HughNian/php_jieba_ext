@@ -9,6 +9,7 @@ jieba中文分词,PHP扩展
 
 ### 依赖软件
 * g++ (version >=4.1 recommended) or clang++;
+
 ### 下载和编译
 和一遍编译PHP的扩展一致,只是需要把字典文件放在程序可以找到的位置
 phpize
