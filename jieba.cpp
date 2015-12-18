@@ -162,9 +162,15 @@ PHP_FUNCTION(jieba_cut)
 	int arg_len, len;
 	char *strg;
 	int arg_count = ZEND_NUM_ARGS();	
+	
+	/*
+	if(arg_count < 1){
+	    return;
+	}
+	*/	
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &arg, &arg_len, &tag) == FAILURE) {
-		return;
+	    return;
 	}
 
 	cppjieba::Jieba jieba("/usr/local/dict/jieba.dict.utf8", "/usr/local/dict/hmm_model.utf8", "/usr/local/dict/user.dict.utf8");	
