@@ -11,11 +11,15 @@ jieba中文分词,PHP扩展
 * g++ (version >=4.1 recommended) or clang++;
 
 ### 下载和编译
-和一遍编译PHP的扩展一致,只是需要把字典文件放在程序可以找到的位置
+
+和一般编译PHP的扩展一致,只是需要把字典文件放在程序可以找到的位置
+
+```sh
 phpize
 ./configure --with-php-config=你的php-config目录
 make
 sudo make install
+```
 
 ##扩展信息页面
 ![phpinfo](https://raw.githubusercontent.com/HughNian/php_jieba_ext/master/jieba.png)
