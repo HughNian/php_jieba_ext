@@ -1,20 +1,20 @@
 /*
-  +----------------------------------------------------------------------+
-  | PHP Version 5                                                        |
-  +----------------------------------------------------------------------+
-  | Copyright (c) 1997-2015 The PHP Group                                |
-  +----------------------------------------------------------------------+
-  | This source file is subject to version 3.01 of the PHP license,      |
-  | that is bundled with this package in the file LICENSE, and is        |
-  | available through the world-wide-web at the following url:           |
-  | http://www.php.net/license/3_01.txt                                  |
-  | If you did not receive a copy of the PHP license and are unable to   |
-  | obtain it through the world-wide-web, please send a note to          |
-  | license@php.net so we can mail you a copy immediately.               |
-  +----------------------------------------------------------------------+
-  | Author:niansong                                                      |
-  +----------------------------------------------------------------------+
-*/
+   +----------------------------------------------------------------------+
+   | PHP Version 5                                                        |
+   +----------------------------------------------------------------------+
+   | Copyright (c) 1997-2015 The PHP Group                                |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.php.net/license/3_01.txt                                  |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author:niansong                                                      |
+   +----------------------------------------------------------------------+
+ */
 
 /* $Id$ */
 
@@ -31,8 +31,8 @@
 using namespace std;
 
 /* If you declare any globals in php_jieba.h uncomment this:
-ZEND_DECLARE_MODULE_GLOBALS(jieba)
-*/
+   ZEND_DECLARE_MODULE_GLOBALS(jieba)
+ */
 
 /* True global resources - no need for thread safety here */
 static int le_jieba;
@@ -43,7 +43,7 @@ static int le_jieba;
  */
 const zend_function_entry jieba_functions[] = {
 	PHP_FE(jieba_cut, NULL)		/* For testing, remove later. */
-	PHP_FE_END	/* Must be the last line in jieba_functions[] */
+		PHP_FE_END	/* Must be the last line in jieba_functions[] */
 };
 /* }}} */
 
@@ -71,34 +71,34 @@ zend_module_entry jieba_module_entry = {
 ZEND_GET_MODULE(jieba)
 #endif
 
-/* {{{ PHP_INI
- */
-/* Remove comments and fill if you need to have entries in php.ini
-PHP_INI_BEGIN()
-    STD_PHP_INI_ENTRY("jieba.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_jieba_globals, jieba_globals)
-    STD_PHP_INI_ENTRY("jieba.global_string", "foobar", PHP_INI_ALL, OnUpdateString, global_string, zend_jieba_globals, jieba_globals)
-PHP_INI_END()
-*/
-/* }}} */
+	/* {{{ PHP_INI
+	 */
+	/* Remove comments and fill if you need to have entries in php.ini
+	   PHP_INI_BEGIN()
+	   STD_PHP_INI_ENTRY("jieba.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_jieba_globals, jieba_globals)
+	   STD_PHP_INI_ENTRY("jieba.global_string", "foobar", PHP_INI_ALL, OnUpdateString, global_string, zend_jieba_globals, jieba_globals)
+	   PHP_INI_END()
+	 */
+	/* }}} */
 
-/* {{{ php_jieba_init_globals
- */
-/* Uncomment this function if you have INI entries
-static void php_jieba_init_globals(zend_jieba_globals *jieba_globals)
-{
-	jieba_globals->global_value = 0;
-	jieba_globals->global_string = NULL;
-}
-*/
-/* }}} */
+	/* {{{ php_jieba_init_globals
+	 */
+	/* Uncomment this function if you have INI entries
+	   static void php_jieba_init_globals(zend_jieba_globals *jieba_globals)
+	   {
+	   jieba_globals->global_value = 0;
+	   jieba_globals->global_string = NULL;
+	   }
+	 */
+	/* }}} */
 
-/* {{{ PHP_MINIT_FUNCTION
- */
+	/* {{{ PHP_MINIT_FUNCTION
+	 */
 PHP_MINIT_FUNCTION(jieba)
 {
 	/* If you have INI entries, uncomment these lines 
-	REGISTER_INI_ENTRIES();
-	*/
+	   REGISTER_INI_ENTRIES();
+	 */
 	return SUCCESS;
 }
 /* }}} */
@@ -108,8 +108,8 @@ PHP_MINIT_FUNCTION(jieba)
 PHP_MSHUTDOWN_FUNCTION(jieba)
 {
 	/* uncomment this line if you have INI entries
-	UNREGISTER_INI_ENTRIES();
-	*/
+	   UNREGISTER_INI_ENTRIES();
+	 */
 	return SUCCESS;
 }
 /* }}} */
@@ -143,8 +143,8 @@ PHP_MINFO_FUNCTION(jieba)
 	php_info_print_table_end();
 
 	/* Remove comments if you have entries in php.ini
-	DISPLAY_INI_ENTRIES();
-	*/
+	   DISPLAY_INI_ENTRIES();
+	 */
 }
 /* }}} */
 
@@ -158,22 +158,51 @@ PHP_MINFO_FUNCTION(jieba)
    Return a string to confirm that the module is compiled in */
 PHP_FUNCTION(jieba_cut)
 {
-	char *arg = NULL;
+	char *arg = NULL,*tag=NULL;
 	int arg_len, len;
 	char *strg;
+	int arg_count = ZEND_NUM_ARGS();	
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &arg, &arg_len, &tag) == FAILURE) {
 		return;
 	}
-	
+
 	cppjieba::Jieba jieba("/usr/local/dict/jieba.dict.utf8", "/usr/local/dict/hmm_model.utf8", "/usr/local/dict/user.dict.utf8");	
 
 	vector<string> words;
 	string result;
 
-        jieba.Cut(arg, words, true);
+	if(arg_count < 2){
+	    jieba.Cut(arg, words, true);
+	} else {
+	    int tagNum = atoi(tag);
+	    /*
+	    if(tagNum < 1 || tagNum > 4){
+	        jieba.Cut(arg, words, true);
+	    }
+	    */
+
+	    switch(tagNum){
+	        case 1:
+		    jieba.Cut(arg, words, true);
+		    break;
+		case 2:
+		    jieba.Cut(arg, words, false);
+		    break;
+		case 3:
+		    jieba.CutAll(arg, words);
+		    break;
+		case 4:
+		    jieba.CutForSearch(arg, words);
+		    break;
+		default:
+		    jieba.Cut(arg, words, true);	
+	    }
+
+	}
+
 	result = limonp::Join(words.begin(), words.end(), "/");
-	
+
 	RETURN_STRINGL(result.c_str(), result.length(), 1);
 }
 /* }}} */
@@ -181,7 +210,7 @@ PHP_FUNCTION(jieba_cut)
    unfold functions in source code. See the corresponding marks just before 
    function definition, where the functions purpose is also documented. Please 
    follow this convention for the convenience of others editing your code.
-*/
+ */
 
 
 /*
