@@ -30,7 +30,17 @@ sudo make install
 $str = "万万没想到,啦啦啦啦";
 $fenci = jieba_cut($str);
 echo $fenci; //output 万万/没想到/,/啦/啦/啦/啦
+
+jieba_cut($str,$tag); //$tag为可选入参,取值范围为1,2,3,4。为选择分词类型参数
 ```
+```
+默认分词类型为：Cut With HMM
+tag=1 Cut With HMM
+tag=2 Cut Without HMM
+tag=3 CutAll 为返回所有切分出的词
+tag=4 CutForSearch
+```
+
 :smile::clap:
 ##结果实例
 ```
@@ -44,7 +54,6 @@ echo $fenci; //output 万万/没想到/,/啦/啦/啦/啦
 小/明/硕士/毕业/于/中国科学院/计算所/，/后/在/日本京都大学/深造
 ```
 
-##鸣谢
-:beers:
+##鸣谢 :beers:
 * "cppjieba"作者：yanyiwu https://github.com/yanyiwu i@yanyiwu.com
 * "结巴"中文分词作者：SunJunyi https://github.com/fxsjy/jieba
