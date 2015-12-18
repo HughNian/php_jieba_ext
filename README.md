@@ -41,5 +41,5 @@ echo $fenci; //output 万万/没想到/,/啦/啦/啦/啦
 
 ##鸣谢
 :beers:
-"cppjieba"作者：yanyiwu https://github.com/yanyiwu i@yanyiwu.com
-"结巴"中文分词作者：SunJunyi https://github.com/fxsjy/jieba
+*"cppjieba"作者：yanyiwu https://github.com/yanyiwu i@yanyiwu.com
+*"结巴"中文分词作者：SunJunyi https://github.com/fxsjy/jieba
