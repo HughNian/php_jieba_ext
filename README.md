@@ -1,6 +1,8 @@
 php exteion jieba 
 =================
 
+[![Author](https://img.shields.io/badge/author-@年嵩-blue.svg?style=flat)](http://yanyiwu.com/) 
+
 jieba中文分词,PHP扩展
 =====================
 
