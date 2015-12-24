@@ -39,6 +39,7 @@ extern zend_module_entry jieba_module_entry;
 #endif
 
 #include "Jieba.hpp"
+using namespace cppjieba;
 
 PHP_MINIT_FUNCTION(jieba);
 PHP_MSHUTDOWN_FUNCTION(jieba);
@@ -46,17 +47,16 @@ PHP_RINIT_FUNCTION(jieba);
 PHP_RSHUTDOWN_FUNCTION(jieba);
 PHP_MINFO_FUNCTION(jieba);
 
-PHP_FUNCTION(jieba_cut);	/* For testing, remove later. */
-
-/* 
-  	Declare any global variables you may need between the BEGIN
-	and END macros here:     
+PHP_FUNCTION(jieba_cut);
+PHP_FUNCTION(jieba_insert_word);
+PHP_FUNCTION(jieba_cut_nhmm);
+PHP_FUNCTION(jieba_cut_all);
+PHP_FUNCTION(jieba_cut_search);
 
 ZEND_BEGIN_MODULE_GLOBALS(jieba)
-	long  global_value;
-	char *global_string;
+    //long  global_value;
+    Jieba *jieba_g;
 ZEND_END_MODULE_GLOBALS(jieba)
-*/
 
 /* In every utility function you add that needs to use variables 
    in php_jieba_globals, call TSRMLS_FETCH(); after declaring other 

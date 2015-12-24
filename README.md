@@ -1,5 +1,4 @@
-php exteion jieba
-=================
+php exteion jieba =================
 
 jieba中文分词,PHP扩展
 =====================
@@ -30,17 +29,23 @@ sudo make install
 $str = "万万没想到,啦啦啦啦";
 $fenci = jieba_cut($str);
 echo $fenci; //output 万万/没想到/,/啦/啦/啦/啦
-
-jieba_cut($str,$tag); //$tag为可选入参,取值范围为1,2,3,4。为选择分词类型参数
 ```
 ```
-默认分词类型为：Cut With HMM
-tag=1 Cut With HMM
-tag=2 Cut Without HMM
-tag=3 CutAll 为返回所有切分出的词
-tag=4 CutForSearch
+多种分词类型
+jieba_cut_nhmm()   //Cut WithOut HMM
+jieba_cut_all()    //CutAll 为返回所有切分出的词
+jieba_cut_search() // CutForSearch
 ```
-
+```
+新增词汇
+jieba_insert_word()
+$str = '天下无贼';
+$fenci = jieba_cut($str);
+echo $fenci; //output 天下/无贼
+jieba_insert_word($str);
+$fenci = jieba_cut($str);
+echo $fenci; //output 天下无贼
+```
 :smile::clap:
 ##结果实例
 ```

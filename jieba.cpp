@@ -30,20 +30,26 @@
 
 using namespace std;
 
-/* If you declare any globals in php_jieba.h uncomment this:
-   ZEND_DECLARE_MODULE_GLOBALS(jieba)
- */
+//If you declare any globals in php_jieba.h uncomment this:
+ZEND_DECLARE_MODULE_GLOBALS(jieba)
 
 /* True global resources - no need for thread safety here */
 static int le_jieba;
+static Jieba jieba("/usr/local/dict/jieba.dict.utf8", 
+		    "/usr/local/dict/hmm_model.utf8", 
+		    "/usr/local/dict/user.dict.utf8");
 
 /* {{{ jieba_functions[]
  *
  * Every user visible function must have an entry in jieba_functions[].
  */
 const zend_function_entry jieba_functions[] = {
-	PHP_FE(jieba_cut, NULL)		/* For testing, remove later. */
-		PHP_FE_END	/* Must be the last line in jieba_functions[] */
+	PHP_FE(jieba_cut, NULL)
+        PHP_FE(jieba_insert_word, NULL)
+	PHP_FE(jieba_cut_nhmm, NULL)
+	PHP_FE(jieba_cut_all, NULL)
+	PHP_FE(jieba_cut_search, NULL)
+	PHP_FE_END
 };
 /* }}} */
 
@@ -81,25 +87,21 @@ ZEND_GET_MODULE(jieba)
 	 */
 	/* }}} */
 
-	/* {{{ php_jieba_init_globals
-	 */
-	/* Uncomment this function if you have INI entries
-	   static void php_jieba_init_globals(zend_jieba_globals *jieba_globals)
-	   {
-	   jieba_globals->global_value = 0;
-	   jieba_globals->global_string = NULL;
-	   }
-	 */
-	/* }}} */
+/* {{{ php_jieba_init_globals */
+// Uncomment this function if you have INI entries
+static void php_jieba_init_globals(zend_jieba_globals *jieba_globals)
+{
+    //jieba_globals->jieba = &jieba;
+}
+/* }}} */
 
-	/* {{{ PHP_MINIT_FUNCTION
-	 */
+/* {{{ PHP_MINIT_FUNCTION*/
 PHP_MINIT_FUNCTION(jieba)
 {
-	/* If you have INI entries, uncomment these lines 
-	   REGISTER_INI_ENTRIES();
-	 */
-	return SUCCESS;
+    ZEND_INIT_MODULE_GLOBALS(jieba,php_jieba_init_globals,NULL);
+    //REGISTER_INI_ENTRIES();
+    JIEBA_G(jieba_g) = &jieba;
+    return SUCCESS;
 }
 /* }}} */
 
@@ -107,10 +109,10 @@ PHP_MINIT_FUNCTION(jieba)
  */
 PHP_MSHUTDOWN_FUNCTION(jieba)
 {
-	/* uncomment this line if you have INI entries
-	   UNREGISTER_INI_ENTRIES();
-	 */
-	return SUCCESS;
+    /* uncomment this line if you have INI entries
+      UNREGISTER_INI_ENTRIES();
+    */
+    return SUCCESS;
 }
 /* }}} */
 
@@ -119,7 +121,8 @@ PHP_MSHUTDOWN_FUNCTION(jieba)
  */
 PHP_RINIT_FUNCTION(jieba)
 {
-	return SUCCESS;
+    JIEBA_G(jieba_g) = &jieba;
+    return SUCCESS;
 }
 /* }}} */
 
@@ -128,7 +131,7 @@ PHP_RINIT_FUNCTION(jieba)
  */
 PHP_RSHUTDOWN_FUNCTION(jieba)
 {
-	return SUCCESS;
+    return SUCCESS;
 }
 /* }}} */
 
@@ -136,17 +139,21 @@ PHP_RSHUTDOWN_FUNCTION(jieba)
  */
 PHP_MINFO_FUNCTION(jieba)
 {
-	php_info_print_table_start();
-	php_info_print_table_header(2, "jieba support", JIEBA_LOGO_IMG"enabled");
-	php_info_print_table_row(2, "Version", JIEBA_VERSION);
-	php_info_print_table_row(2, "Author", JIEBA_EXT_AUTHOR);
-	php_info_print_table_end();
-
-	/* Remove comments if you have entries in php.ini
-	   DISPLAY_INI_ENTRIES();
-	 */
+    php_info_print_table_start();
+    php_info_print_table_header(2, "jieba support", JIEBA_LOGO_IMG"enabled");
+    php_info_print_table_row(2, "Version", JIEBA_VERSION);
+    php_info_print_table_row(2, "Author", JIEBA_EXT_AUTHOR);
+    php_info_print_table_end();
 }
 /* }}} */
+
+void cutAll(char* arg, vector<string> words)
+{
+    Jieba *jieba_obj;
+    jieba_obj = JIEBA_G(jieba_g);
+    
+    jieba_obj->CutAll(arg, words);	
+}
 
 
 /* Remove the following function when you have successfully modified config.m4
@@ -158,66 +165,117 @@ PHP_MINFO_FUNCTION(jieba)
    Return a string to confirm that the module is compiled in */
 PHP_FUNCTION(jieba_cut)
 {
-	char *arg = NULL,*tag=NULL;
-	int arg_len, len;
-	char *strg;
-	int arg_count = ZEND_NUM_ARGS();	
+    char *arg = NULL,*tag=NULL;
+    int arg_len, len;
+    char *strg;
+    int arg_count = ZEND_NUM_ARGS();	
+    Jieba *jieba_obj;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
+        return;
+    }
+
+    vector<string> words;
+    string result;
 	
-	/*
-	if(arg_count < 1){
-	    return;
-	}
-	*/	
+    jieba_obj = JIEBA_G(jieba_g);	
+    jieba_obj->Cut(arg, words, true);
+	
+    result = limonp::Join(words.begin(), words.end(), "/");	    
+    RETURN_STRINGL(result.c_str(), result.length(), 1);
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &arg, &arg_len, &tag) == FAILURE) {
-	    return;
-	}
-
-	cppjieba::Jieba jieba("/usr/local/dict/jieba.dict.utf8", "/usr/local/dict/hmm_model.utf8", "/usr/local/dict/user.dict.utf8");	
-
-	vector<string> words;
-	string result;
-
-	if(arg_count < 2){
-	    jieba.Cut(arg, words, true);
-	} else {
-	    int tagNum = atoi(tag);
-	    /*
-	    if(tagNum < 1 || tagNum > 4){
-	        jieba.Cut(arg, words, true);
-	    }
-	    */
-
-	    switch(tagNum){
-	        case 1:
-		    jieba.Cut(arg, words, true);
-		    break;
-		case 2:
-		    jieba.Cut(arg, words, false);
-		    break;
-		case 3:
-		    jieba.CutAll(arg, words);
-		    break;
-		case 4:
-		    jieba.CutForSearch(arg, words);
-		    break;
-		default:
-		    jieba.Cut(arg, words, true);	
-	    }
-
-	}
-
-	result = limonp::Join(words.begin(), words.end(), "/");
-
-	RETURN_STRINGL(result.c_str(), result.length(), 1);
 }
 /* }}} */
-/* The previous line is meant for vim and emacs, so it can correctly fold and 
-   unfold functions in source code. See the corresponding marks just before 
-   function definition, where the functions purpose is also documented. Please 
-   follow this convention for the convenience of others editing your code.
- */
 
+/* 
+The previous line is meant for vim and emacs, so it can correctly fold and 
+unfold functions in source code. See the corresponding marks just before 
+function definition, where the functions purpose is also documented. Please 
+follow this convention for the convenience of others editing your code.
+*/
+
+//cut without hmm
+PHP_FUNCTION(jieba_cut_nhmm)
+{
+    int argc = ZEND_NUM_ARGS();
+    char *arg = NULL;
+    int arg_len;    
+    Jieba *jieba_obj;
+
+    if (zend_parse_parameters(argc TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
+        return;
+    }
+    
+    vector<string> words;
+    string result;
+	
+    jieba_obj = JIEBA_G(jieba_g);	
+    jieba_obj->Cut(arg, words, false);	
+	
+    result = limonp::Join(words.begin(), words.end(), "/");	    
+    RETURN_STRINGL(result.c_str(), result.length(), 1);
+}
+
+//cut all
+PHP_FUNCTION(jieba_cut_all)
+{
+    int argc = ZEND_NUM_ARGS();
+    char *arg = NULL;
+    int arg_len;    
+    Jieba *jieba_obj;
+
+    if (zend_parse_parameters(argc TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
+        return;
+    }
+    
+    vector<string> words;
+    string result;
+	
+    jieba_obj = JIEBA_G(jieba_g);	
+    jieba_obj->CutAll(arg, words);	
+	
+    result = limonp::Join(words.begin(), words.end(), "/");	    
+    RETURN_STRINGL(result.c_str(), result.length(), 1);
+}
+
+//cut for search
+PHP_FUNCTION(jieba_cut_search)
+{
+    int argc = ZEND_NUM_ARGS();
+    char *arg = NULL;
+    int arg_len;    
+    Jieba *jieba_obj;
+
+    if (zend_parse_parameters(argc TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
+        return;
+    }
+    
+    vector<string> words;
+    string result;
+	
+    jieba_obj = JIEBA_G(jieba_g);	
+    jieba_obj->CutForSearch(arg, words);	
+	
+    result = limonp::Join(words.begin(), words.end(), "/");	    
+    RETURN_STRINGL(result.c_str(), result.length(), 1);
+}
+
+
+//插入新词
+PHP_FUNCTION(jieba_insert_word)
+{
+    int argc = ZEND_NUM_ARGS();
+    char* arg = NULL;
+    int arg_len;    
+    
+    if (zend_parse_parameters(argc TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
+        return;
+    }
+    
+    JIEBA_G(jieba_g)->InsertUserWord(arg);
+	
+    RETURN_TRUE;
+}
 
 /*
  * Local variables:
