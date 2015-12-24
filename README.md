@@ -1,4 +1,5 @@
-php exteion jieba =================
+php exteion jieba 
+=================
 
 jieba中文分词,PHP扩展
 =====================
@@ -36,7 +37,7 @@ jieba_cut_nhmm()   //Cut WithOut HMM
 jieba_cut_all()    //CutAll 为返回所有切分出的词
 jieba_cut_search() // CutForSearch
 ```
-```
+```php
 新增词汇
 jieba_insert_word()
 $str = '天下无贼';
