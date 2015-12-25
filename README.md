@@ -33,6 +33,13 @@ echo $fenci; //output 万万/没想到/,/啦/啦/啦/啦
 ```
 ```
 多种分词类型
+1.利用tag标识
+tag = 1, //Cut With HMM
+tag = 2, //Cut WithOut HMM
+tag = 3, //CutAll
+tag = 4, //CutForSearch
+
+2.单独的函数
 jieba_cut_nhmm()   //Cut WithOut HMM
 jieba_cut_all()    //CutAll 为返回所有切分出的词
 jieba_cut_search() // CutForSearch
