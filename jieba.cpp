@@ -147,15 +147,6 @@ PHP_MINFO_FUNCTION(jieba)
 }
 /* }}} */
 
-void cutAll(char* arg, vector<string> words)
-{
-    Jieba *jieba_obj;
-    jieba_obj = JIEBA_G(jieba_g);
-    
-    jieba_obj->CutAll(arg, words);	
-}
-
-
 /* Remove the following function when you have successfully modified config.m4
    so that your module can be compiled into PHP, it exists only for testing
    purposes. */
