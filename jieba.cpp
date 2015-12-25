@@ -165,13 +165,14 @@ void cutAll(char* arg, vector<string> words)
    Return a string to confirm that the module is compiled in */
 PHP_FUNCTION(jieba_cut)
 {
-    char *arg = NULL,*tag=NULL;
+    char *arg = NULL;
     int arg_len, len;
     char *strg;
-    int arg_count = ZEND_NUM_ARGS();	
+    int arg_count = ZEND_NUM_ARGS();
+    int tag;   
     Jieba *jieba_obj;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|l", &arg, &arg_len, &tag) == FAILURE) {
         return;
     }
 
@@ -180,7 +181,17 @@ PHP_FUNCTION(jieba_cut)
 	
     jieba_obj = JIEBA_G(jieba_g);	
     jieba_obj->Cut(arg, words, true);
-	
+
+    if(tag == 1){
+	jieba_obj->Cut(arg, words, true);
+    } else if(tag == 2) {
+	jieba_obj->Cut(arg, words, false);
+    } else if(tag == 3){
+	jieba_obj->CutAll(arg, words);
+    } else if(tag == 4){
+	jieba_obj->CutForSearch(arg, words);
+    }
+
     result = limonp::Join(words.begin(), words.end(), "/");	    
     RETURN_STRINGL(result.c_str(), result.length(), 1);
 
