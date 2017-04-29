@@ -1,7 +1,7 @@
 php exteion jieba 
 =================
 
-[![Author](https://img.shields.io/badge/author-@年嵩-blue.svg?style=flat)](http://yanyiwu.com/) 
+[![Author](https://img.shields.io/badge/author-@年嵩-blue.svg?style=flat)](https://github.com/HughNian/php_jieba_ext) 
 
 jieba中文分词,PHP扩展
 =====================
@@ -23,10 +23,10 @@ make
 sudo make install
 ```
 
-##扩展信息页面
+## 扩展信息页面
 ![phpinfo](https://raw.githubusercontent.com/HughNian/php_jieba_ext/master/jieba.png)
 
-##使用
+## 使用
 ```php
 <?php
 $str = "万万没想到,啦啦啦啦";
@@ -58,7 +58,7 @@ $fenci = jieba_cut($str);
 echo $fenci; //output 天下无贼
 ```
 :smile::clap:
-##结果实例
+## 结果实例
 ```
 我来到北京清华大学
 我/来到/北京/清华大学
@@ -70,6 +70,6 @@ echo $fenci; //output 天下无贼
 小/明/硕士/毕业/于/中国科学院/计算所/，/后/在/日本京都大学/深造
 ```
 
-##鸣谢 :beers:
+## 鸣谢 :beers:
 * "cppjieba"作者：yanyiwu https://github.com/yanyiwu i@yanyiwu.com
 * "结巴"中文分词作者：SunJunyi https://github.com/fxsjy/jieba
